@@ -40,20 +40,20 @@ namespace Gadget_Gourmet.Controllers
 			}
 			return View(prod);
 		}
-		[HttpPost]
-		public async Task<IActionResult> AddProduct(Product prod)
-		{
-			if (!ModelState.IsValid)
-			{
-				ModelState.AddModelError(string.Empty, "Resolve the Errors and Try Again!");
-				return View();
-			}
+        [HttpPost]
+        public async Task<IActionResult> AddProduct(Product prod)
+        {
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError(string.Empty, "Resolve the Errors and Try Again!");
+                return View(prod);
+            }
 
             await _productService.Insert(prod);
 
-			string msg = string.Empty;
-			return RedirectToAction("Index", "Admin", new { message = msg });
-		}
+            string msg = "Product added successfully!";
+            return RedirectToAction("Index", "Admin", new { message = msg });
+        }
 
         #endregion
 

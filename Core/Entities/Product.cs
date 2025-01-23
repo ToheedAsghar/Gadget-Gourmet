@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
+using System.ComponentModel.DataAnnotations;
 using System.Drawing;
 
 namespace Core.Entities
 {
     public class Product
     {
-		[Required(ErrorMessage = "Id is required.")]
-		[Range(1, int.MaxValue, ErrorMessage = "Id must be a positive number")]
-		public int Id { get; set; } = -1;
-
+        [Required(ErrorMessage = "Id is required.")]
+        //[Range(1, int.MaxValue, ErrorMessage = "Id must be a positive number")]
+        [BindNever]
+        public int Id { get; set; } = 0;
 
         [Required(ErrorMessage ="Invalid Name Entered!")]
         public string? Name { get; set; }
