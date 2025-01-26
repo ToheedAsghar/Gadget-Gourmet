@@ -1,0 +1,135 @@
+﻿@page "/admin/product/add"
+@using Core.Entities
+@inject Application.ProductService ProductService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Add Product
+</h1>
+
+<div>
+    <EditForm Model="Product" OnValidSubmit="HandleValidSubmit" class="mt-3">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+
+        <!-- Product Name -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Name" class="form-label">Product Name</label>
+                    <InputText id="Name" class="form-control" @bind-Value="Product.Name" />
+                    <ValidationMessage For="@(() => Product.Name)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Description -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Description" class="form-label">Product Description</label>
+                    <InputTextArea id="Description" class="form-control" @bind-Value="Product.Description" />
+                    <ValidationMessage For="@(() => Product.Description)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Weight -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Weight" class="form-label">Product Weight (in Grams)</label>
+                    <InputNumber id="Weight" class="form-control" @bind-Value="Product.Weight" />
+                    <ValidationMessage For="@(() => Product.Weight)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Price -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Price" class="form-label">Price</label>
+                    <InputNumber id="Price" class="form-control" @bind-Value="Product.Price" Step="0.01" />
+                    <ValidationMessage For="@(() => Product.Price)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Color -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Color" class="form-label">Color</label>
+                    <InputText id="Color" class="form-control" @bind-Value="Product.Color" />
+                    <ValidationMessage For="@(() => Product.Color)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Manufacturer -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Manufacturer" class="form-label">Product Manufacturer</label>
+                    <InputText id="Manufacturer" class="form-control" @bind-Value="Product.Manufacturer" />
+                    <ValidationMessage For="@(() => Product.Manufacturer)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Category -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Category" class="form-label">Product Category</label>
+                    <InputText id="Category" class="form-control" @bind-Value="Product.Category" />
+                    <ValidationMessage For="@(() => Product.Category)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Quantity -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Quantity" class="form-label">Product Quantity</label>
+                    <InputNumber id="Quantity" class="form-control" @bind-Value="Product.Quantity" />
+                    <ValidationMessage For="@(() => Product.Quantity)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary text-center">Submit</button>
+    </EditForm>
+</div>
+
+<!-- Return Link -->
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <NavLink class="nav-link text-dark" href="/admin">Return to Admin Panel</NavLink>
+    </div>
+</div>
+
+@code {
+    private Product Product { get; set; } = new Product();
+
+    protected override void OnInitialized()
+    {
+        // Initialize any additional logic if necessary
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await ProductService.Insert(Product);
+        NavigateToAdmin("Product added successfully!");
+    }
+
+    private void NavigateToAdmin(string message)
+    {
+        // Pass the message as a query parameter or use a state management solution
+        NavigationManager.NavigateTo($"/admin?message={Uri.EscapeDataString(message)}");
+    }
+}

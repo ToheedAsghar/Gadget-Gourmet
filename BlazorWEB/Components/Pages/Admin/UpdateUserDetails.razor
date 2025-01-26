@@ -1,0 +1,151 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/user/update/details/{UserId:int}"
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Update User Details
+</h1>
+
+<div class="mb-5">
+    <EditForm Model="User" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        @* Name *@
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Name" class="form-label">Full Name</label>
+                    <InputText id="Name" class="form-control" @bind-Value="User.Name" />
+                </div>
+            </div>
+        </div>
+
+        @* UserName *@
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="UserName" class="form-label">UserName</label>
+                    <InputText id="UserName" class="form-control" @bind-Value="User.UserName" />
+                </div>
+            </div>
+        </div>
+
+        @* Email *@
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Email" class="form-label">Email</label>
+                    <InputText id="Email" type="email" class="form-control" @bind-Value="User.Email" />
+                </div>
+            </div>
+        </div>
+
+        @* New Password *@
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Password" class="form-label">New Password</label>
+                    <InputText id="Password" type="password" class="form-control" @bind-Value="User.Password" />
+                </div>
+            </div>
+        </div>
+
+        @* Address *@
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Address" class="form-label">Address</label>
+                    <InputTextArea id="Address" class="form-control" @bind-Value="User.Address" />
+                </div>
+            </div>
+        </div>
+
+        @* Phone *@
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Phone" class="form-label">Phone#</label>
+                    <InputText id="Phone" type="tel" class="form-control" @bind-Value="User.Phone" />
+                </div>
+            </div>
+        </div>
+
+        @* Gender *@
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Gender" class="form-label">Gender</label>
+                    <InputSelect id="Gender" class="form-control" @bind-Value="User.Gender">
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Prefer not to specify">Prefer not to specify</option>
+                    </InputSelect>
+                </div>
+            </div>
+        </div>
+
+        @* DateOfBirth *@
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="DateOfBirth" class="form-label">Date Of Birth</label>
+                    <InputDate id="DateOfBirth" class="form-control" @bind-Value="User.DateOfBirth" />
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="custom-button text-center">Update</button>
+    </EditForm>
+</div>
+
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <button class="btn btn-link text-dark" @onclick="NavigateToAdminPanel">
+            Return to Admin Panel
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int UserId { get; set; }
+    private User User { get; set; } = new User();
+    private string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch user details by ID
+            User = await UserService.GetById(UserId);
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Unable to load user details.";
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            // Update user details
+            await UserService.Update(User);
+
+            // Navigate to the admin panel after successful update
+            NavigationManager.NavigateTo("/admin");
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "An error occurred while updating the user details. Please try again.";
+        }
+    }
+
+    private void NavigateToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}

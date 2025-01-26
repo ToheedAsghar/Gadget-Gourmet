@@ -1,0 +1,70 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/category/add/{Id:int?}"
+@inject CategoryService CategoryService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Introduce a New Category
+</h1>
+
+<div class="mb-5">
+    <EditForm Model="Category" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <!-- Category Name -->
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Name" class="form-label">Category Name</label>
+                    <InputText id="Name" class="form-control" @bind-Value="Category.Name" />
+                    <ValidationMessage For="@(() => Category.Name)" class="text-danger" />
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="custom-button text-center">Add</button>
+    </EditForm>
+</div>
+
+<div class="container-fluid mt-5" style="font-family: Noah;">
+    <div class="row">
+        <a class="nav-link text-dark" @onclick="ReturnToAdminPanel">Return to Admin Panel</a>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private Category Category = new Category();
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id.HasValue && Id.Value > 0)
+        {
+            Category = await CategoryService.GetById(Id.Value) ?? new Category();
+        }
+        else
+        {
+            Category = new Category { Name = string.Empty };
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (string.IsNullOrEmpty(Category.Name))
+        {
+            // Simple inline validation
+            return;
+        }
+
+        await CategoryService.Insert(Category);
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    private void ReturnToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}

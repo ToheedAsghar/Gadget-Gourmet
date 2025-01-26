@@ -1,0 +1,64 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/category/update"
+@inject CategoryService CategoryService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Unhappy With Name? Rename it!
+</h1>
+
+<div class="mb-md-5">
+    <EditForm Model="CategoryId" OnValidSubmit="HandleSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Id" class="form-label">Category Id</label>
+                    <InputNumber id="Id" class="form-control" @bind-Value="CategoryId" />
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger">@ErrorMessage</div>
+        }
+
+        <button type="submit" class="custom-button text-center">Rename</button>
+    </EditForm>
+</div>
+
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <button class="btn btn-link text-dark" @onclick="ReturnToAdminPanel">
+            Return to Admin Panel
+        </button>
+    </div>
+</div>
+
+@code {
+    private int CategoryId { get; set; }
+    private string ErrorMessage { get; set; }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            // Navigate to update category details page with the entered CategoryId
+            NavigationManager.NavigateTo($"/admin/category/update/details/{CategoryId}");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while processing your request. Please try again.";
+        }
+    }
+
+    private void ReturnToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}

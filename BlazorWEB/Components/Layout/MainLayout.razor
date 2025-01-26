@@ -11,7 +11,7 @@
     <link href="~/Identity.styles.css" rel="stylesheet" />
 
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
 
     <header style="font-family: Noah">
 
@@ -34,9 +34,9 @@
                         <li class="nav-item">
                             <NavLink class="nav-link text-dark" href="/store">Shop</NavLink>
                         </li>
-                        <li class="nav-item">
-                            <LoginDisplay />
-                        </li>
+                        @* <li class="nav-item"> *@
+                        @*     <@LoginDisplay /> *@
+                        @* </li> *@
                         <li class="nav-item">
                             <NavLink class="nav-link text-dark" href="/history">History</NavLink>
                         </li>
@@ -47,32 +47,32 @@
                 </div>
 
                 <ul class="navbar-nav me-5 order-md-3 order-3">
-                    <li class="nav-item">
 
-                        <!-- Search bar -->
-                        <div class="d-flex justify-content-center mx-auto mt-3">
-                            <EditForm Model="searchModel" OnValidSubmit="HandleSearch">
-                                <div class="input-group" style="height: 35px;">
-                                    <InputText @bind-Value="searchModel.SearchString" type="text" id="searchInput" class="form-control" placeholder="Search for a Product..." style="width: 250px; border-radius: 25px 0 0 25px; height: 35px;" />
-                                    <button type="submit" class="input-group-text search-icon" style="border-radius: 0 25px 25px 0; height: 35px;">
-                                        <i class="fas fa-search"></i>
-                                    </button>
-                                </div>
-                                <!-- You can handle search results with Blazor components or JavaScript interop -->
-                            </EditForm>
-                        </div>
+                    <AuthorizeView>
+                        <NotAuthorized>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/Account/Register">
+                                    <img src="~/images/icons/cart-header-icon.svg" alt="Register" width="24" height="24" />
+                                </NavLink>
+                            </li>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/Account/Login">
+                                    <img src="~/images/icons/account-header-icon.svg" alt="Login" width="24" height="24" />
+                                </NavLink>
+                            </li>
+                        </NotAuthorized>
+                        <Authorized>
+                            <li class="nav-item">
+                                <NavLink class="nav-link" href="/profile">
+                                    <img src="~/images/icons/account-header-icon.svg" alt="User Account" width="24" height="24" />
+                                </NavLink>
+                            </li>
+                        </Authorized>
 
-                    </li>
-                    <li class="nav-item">
-                        <NavLink class="nav-link" href="/cart">
-                            <img src="~/images/icons/cart-header-icon.svg" alt="Cart" width="24" height="24" />
-                        </NavLink>
-                    </li>
-                    <li class="nav-item">
-                        <NavLink class="nav-link" href="/users/profile">
-                            <img src="~/images/icons/account-header-icon.svg" alt="User Account" width="24" height="24" />
-                        </NavLink>
-                    </li>
+                    </AuthorizeView>
+
+
+
                 </ul>
             </div>
         </nav>
@@ -85,7 +85,7 @@
     </div>
 
     <!-- Footer -->
-    <div class="container" style="font-family:Noah">
+    <div class="container mt-auto py-3" style="font-family:Noah">
         <div class="row" style="min-height: 200px">
 
             <div class="col-md-4">

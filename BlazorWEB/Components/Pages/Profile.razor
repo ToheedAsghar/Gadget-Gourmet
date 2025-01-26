@@ -1,0 +1,144 @@
+﻿@page "/profile"
+@using BlazorWEB.Data
+
+@inject Microsoft.AspNetCore.Components.Authorization.AuthenticationStateProvider AuthenticationStateProvider
+@inject Microsoft.AspNetCore.Identity.UserManager<ApplicationUser> UserManager
+@inject Microsoft.AspNetCore.Identity.SignInManager<ApplicationUser> SignInManager
+@inject NavigationManager NavigationManager
+@* @rendermode InteractiveServer *@
+
+<PageTitle>Your Profile</PageTitle>
+
+@if (!_isAuthenticated)
+{
+    <div class="container mt-5">
+        <div class="alert alert-warning" role="alert">
+            You are not logged in. Please log in to view your profile.
+        </div>
+    </div>
+}
+else
+{
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-12 col-md-8 offset-md-2">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">Your Profile</h4>
+                    </div>
+                    <div class="card-body">
+                        <dl class="row">
+                            <dt class="col-sm-4">Email</dt>
+                            <dd class="col-sm-8">@Email</dd>
+
+                            <dt class="col-sm-4">First Name</dt>
+                            <dd class="col-sm-8">@FirstName</dd>
+
+                            <dt class="col-sm-4">Last Name</dt>
+                            <dd class="col-sm-8">@LastName</dd>
+
+                            <dt class="col-sm-4">Date of Birth</dt>
+                            <dd class="col-sm-8">
+                                @((DateOfBirth == null)
+                                    ? "-"
+                                    : DateOfBirth?.ToString("dd-MMM-yyyy"))
+                            </dd>
+                        </dl>
+                    </div>
+                    <div class="card-footer text-end">
+                        <div class="nav-item px-3">
+                            <form action="Account/Logout" method="post">
+                                <AntiforgeryToken />
+                                <input type="hidden" name="ReturnUrl" value="@currentUrl" />
+                                <button type="submit" class="nav-link">
+                                    <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
+                                </button>
+                            </form>
+                </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private bool _isAuthenticated;
+    private string? Email;
+    private string? FirstName;
+    private string? LastName;
+    private DateTime? DateOfBirth;
+    private string? currentUrl;
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        NavigationManager.LocationChanged += OnLocationChanged;
+        try
+        {
+            // Get the user's authentication state
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+
+            _isAuthenticated = user?.Identity?.IsAuthenticated ?? false;
+            if (!_isAuthenticated)
+            {
+                return;
+            }
+
+            // Safely get the user ID
+            var userId = UserManager.GetUserId(user);
+            if (string.IsNullOrEmpty(userId))
+            {
+                _isAuthenticated = false; // If user ID is not found, mark as unauthenticated
+                return;
+            }
+
+            // Load the ApplicationUser from Identity
+            var appUser = await UserManager.FindByIdAsync(userId);
+            if (appUser != null)
+            {
+                Email = appUser.Email;
+                FirstName = appUser.FirstName;
+                LastName = appUser.LastName;
+                DateOfBirth = appUser.DateOfBirth;
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Error loading profile: {ex.Message}");
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        try
+        {
+            if (SignInManager == null)
+            {
+                throw new InvalidOperationException("SignInManager is not initialized.");
+            }
+
+            // Log out the user
+            await SignInManager.SignOutAsync();
+
+            // Redirect to the login page
+            NavigationManager.NavigateTo("/Identity/Account/Login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            Console.Error.WriteLine($"Logout failed: {ex.Message}");
+            throw; // Allow global error handling to capture it
+        }
+    }
+    private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
+    {
+        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        StateHasChanged();
+    }
+
+    public void Dispose()
+    {
+        NavigationManager.LocationChanged -= OnLocationChanged;
+    }
+}

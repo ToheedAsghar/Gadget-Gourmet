@@ -1,0 +1,81 @@
+﻿@page "/admin"
+@using Microsoft.AspNetCore.WebUtilities
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <div class="alert alert-success">@Message</div>
+}
+
+<h2>Manage Products</h2>
+<div>
+    <NavLink class="nav-link text-dark" href="/admin/product/add">Add Product</NavLink>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/product/update"))">Update Product</button>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/product/remove"))">Delete Product</button>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/products"))">View All Products</button>
+    <NavLink class="nav-link text-dark" href="/admin/products">All Product</NavLink>
+
+</div>
+
+<h2>Manage Users</h2>
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/user/add"))">Add User</button>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/user/update"))">Update User</button>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/user/remove"))">Delete User</button>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/users"))">View All Users</button>
+</div>
+
+<h2>Categories Section</h2>
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/category/add"))">Add Category</button>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/category/remove"))">Remove Category</button>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/category/update"))">Update Category</button>
+</div>
+
+<div>
+    <button class="btn btn-link" @onclick="@(() => NavigateToPage("/admin/categories"))">All Categories with CRUD</button>
+</div>
+
+@code {
+    [Parameter]
+    public string Message { get; set; }
+
+    protected override void OnInitialized()
+    {
+        var uri = NavigationManager.ToAbsoluteUri(NavigationManager.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("message", out var msg))
+        {
+            Message = msg;
+        }
+    }
+
+    private void NavigateToPage(string url)
+    {
+        NavigationManager.NavigateTo(url);
+    }
+}

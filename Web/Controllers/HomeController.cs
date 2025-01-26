@@ -65,7 +65,7 @@ namespace Gadget_Gourmet.Controllers
             return View();
         }
 		[HttpPost]
-        public IActionResult Return(Return model)
+        public IActionResult Return(ReturnModel model)
         {
             if (ModelState.IsValid)
             {

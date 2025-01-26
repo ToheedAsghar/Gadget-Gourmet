@@ -1,0 +1,68 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/product/remove"
+@inject ProductService ProductService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Remove Product
+</h1>
+
+<div class="mb-md-5">
+    <EditForm Model="ProductId" OnValidSubmit="HandleRemove">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Id" class="form-label">Product Id</label>
+                    <InputNumber id="Id" class="form-control" @bind-Value="ProductId" />
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger">@ErrorMessage</div>
+        }
+
+        <button type="submit" class="custom-button text-center">Remove</button>
+    </EditForm>
+</div>
+
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <button class="btn btn-link text-dark" @onclick="NavigateToAdminPanel">
+            Return to Admin Panel
+        </button>
+    </div>
+</div>
+
+@code {
+    private int ProductId { get; set; }
+    private string ErrorMessage { get; set; }
+
+    private async Task HandleRemove()
+    {
+        try
+        {
+            // Attempt to delete the product using the provided ProductId
+            await ProductService.Delete(ProductId);
+
+            // Navigate to the admin panel upon successful deletion
+            NavigationManager.NavigateTo("/admin");
+        }
+        catch (Exception ex)
+        {
+            // Display an error message if something goes wrong
+            ErrorMessage = "An error occurred while trying to remove the product. Please ensure the Product ID is correct and try again.";
+        }
+    }
+
+    private void NavigateToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}

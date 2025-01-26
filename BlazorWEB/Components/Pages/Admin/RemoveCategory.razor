@@ -1,0 +1,68 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/category/remove"
+@inject CategoryService CategoryService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Unhappy with a Category, Just Remove It!
+</h1>
+
+<div class="mb-md-5">
+    <EditForm Model="CategoryId" OnValidSubmit="HandleRemove">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="container mb-3">
+            <div class="row">
+                <div class="col-md-5 col-12">
+                    <label for="Id" class="form-label">Category Id</label>
+                    <InputNumber id="Id" class="form-control" @bind-Value="CategoryId" />
+                </div>
+            </div>
+        </div>
+
+        @if (!string.IsNullOrEmpty(ErrorMessage))
+        {
+            <div class="alert alert-danger">@ErrorMessage</div>
+        }
+
+        <button type="submit" class="custom-button text-center">Remove</button>
+    </EditForm>
+</div>
+
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <button class="btn btn-link text-dark" @onclick="NavigateToAdminPanel">
+            Return to Admin Panel
+        </button>
+    </div>
+</div>
+
+@code {
+    private int CategoryId { get; set; }
+    private string ErrorMessage { get; set; }
+
+    private async Task HandleRemove()
+    {
+        try
+        {
+            // Attempt to delete the category using the provided CategoryId
+            await CategoryService.Delete(CategoryId);
+
+            // Navigate to the admin panel upon successful deletion
+            NavigationManager.NavigateTo("/admin");
+        }
+        catch (Exception ex)
+        {
+            // Display an error message if something goes wrong
+            ErrorMessage = "An error occurred while trying to remove the category. Please ensure the Category ID is correct and try again.";
+        }
+    }
+
+    private void NavigateToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}

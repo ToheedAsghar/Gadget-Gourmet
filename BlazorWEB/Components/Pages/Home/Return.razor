@@ -1,0 +1,221 @@
+﻿@*
+@using Core.Entities
+@using Core.Interface
+@inject IReturnService ReturnService
+@inject NavigationManager NavigationManager
+
+<h2 class="text-center">Return Request</h2>
+
+<EditForm Model="returnModel" OnValidSubmit="HandleValidSubmit" enctype="multipart/form-data">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="Name">Name:</label>
+        <InputText id="Name" class="form-control" @bind-Value="returnModel.Name" />
+        <ValidationMessage For="@(() => returnModel.Name)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email:</label>
+        <InputText id="Email" type="email" class="form-control" @bind-Value="returnModel.Email" />
+        <ValidationMessage For="@(() => returnModel.Email)" />
+    </div>
+
+    <div class="form-group">
+        <label for="PhoneNumber">Phone Number:</label>
+        <InputText id="PhoneNumber" class="form-control" @bind-Value="returnModel.PhoneNumber" />
+        <ValidationMessage For="@(() => returnModel.PhoneNumber)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Reason">Reason for Return:</label>
+        <InputTextArea id="Reason" class="form-control" @bind-Value="returnModel.Reason" />
+        <ValidationMessage For="@(() => returnModel.Reason)" />
+    </div>
+
+    <div class="form-group">
+        <label for="Invoice">Upload Invoice:</label>
+        <InputFile id="Invoice" OnChange="HandleFileSelected" />
+        @if (!string.IsNullOrEmpty(invoiceError))
+        {
+            <div class="text-danger">@invoiceError</div>
+        }
+    </div>
+
+    <button type="submit" class="btn btn-primary">Submit Return</button>
+</EditForm>
+
+@if (submissionSuccess)
+{
+    <div class="alert alert-success mt-3">
+        Return request submitted successfully.
+    </div>
+}
+
+@if (!string.IsNullOrEmpty(submissionError))
+{
+    <div class="alert alert-danger mt-3">
+        @submissionError
+    </div>
+}
+
+@code {
+    private ReturnModel returnModel = new();
+    private IBrowserFile selectedFile;
+    private string invoiceError;
+    private bool submissionSuccess = false;
+    private string submissionError;
+
+    private async Task HandleValidSubmit()
+    {
+        if (selectedFile != null)
+        {
+            // Optional: Validate file type and size
+            var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".pdf" };
+            var extension = Path.GetExtension(selectedFile.Name).ToLower();
+
+            if (!allowedExtensions.Contains(extension))
+            {
+                invoiceError = "Only JPG, JPEG, PNG, and PDF files are allowed.";
+                return;
+            }
+
+            if (selectedFile.Size > 5 * 1024 * 1024) // 5 MB limit
+            {
+                invoiceError = "File size cannot exceed 5 MB.";
+                return;
+            }
+
+            // Convert IBrowserFile to IFormFile
+            using (var stream = selectedFile.OpenReadStream(maxAllowedSize: 5 * 1024 * 1024))
+            {
+                var memoryStream = new MemoryStream();
+                await stream.CopyToAsync(memoryStream);
+                memoryStream.Position = 0;
+
+                var formFile = new FormFile(memoryStream, 0, memoryStream.Length, null, selectedFile.Name)
+                    {
+                        Headers = new HeaderDictionary(),
+                        ContentType = selectedFile.ContentType
+                    };
+
+                returnModel.Invoice = formFile;
+            }
+        }
+
+        var result = await ReturnService.SubmitReturnRequestAsync(returnModel);
+
+        if (result)
+        {
+            // Optionally, navigate to confirmation page
+            NavigationManager.NavigateTo("/confirmation");
+        }
+        else
+        {
+            submissionError = "An error occurred while submitting the return request. Please try again later.";
+        }
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        invoiceError = null;
+        selectedFile = e.File;
+    }
+}
+
+*@
+
+@page "/return"
+@using System.ComponentModel.DataAnnotations
+@inject IWebHostEnvironment WebHostEnvironment
+@inject NavigationManager NavigationManager
+@using Core.Entities
+@using Microsoft.AspNetCore.Components.Forms
+
+<EditForm Model="returnModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container mt-4 form-container">
+        <h2 class="text-center">Return Request</h2>
+
+        <div class="form-group">
+            <label for="Name">Name:</label>
+            <InputText id="Name" @bind-Value="returnModel.Name" class="form-control" />
+            <ValidationMessage For="@(() => returnModel.Name)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Email">Email:</label>
+            <InputText id="Email" @bind-Value="returnModel.Email" type="email" class="form-control" />
+            <ValidationMessage For="@(() => returnModel.Email)" />
+        </div>
+
+        <div class="form-group">
+            <label for="PhoneNumber">Phone Number:</label>
+            <InputText id="PhoneNumber" @bind-Value="returnModel.PhoneNumber" class="form-control" />
+            <ValidationMessage For="@(() => returnModel.PhoneNumber)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Reason">Reason for Return:</label>
+            <InputTextArea id="Reason" @bind-Value="returnModel.Reason" class="form-control" />
+            <ValidationMessage For="@(() => returnModel.Reason)" />
+        </div>
+
+        <div class="form-group">
+            <label for="Invoice">Upload Invoice:</label>
+            <InputFile id="Invoice" OnChange="HandleFileSelected" class="form-control-file" />
+            <ValidationMessage For="@(() => returnModel.Invoice)" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Submit Return</button>
+    </div>
+</EditForm>
+
+@code {
+    private ReturnModel returnModel = new();
+
+    private IBrowserFile selectedFile;
+
+    private async Task HandleValidSubmit()
+    {
+        string invoicePathUrl = null;
+
+        if (selectedFile != null)
+        {
+            string uploadsFolder = Path.Combine(WebHostEnvironment.WebRootPath, "Images", "Receipts");
+            string uniqueFileName = $"{Guid.NewGuid()}_{selectedFile.Name}";
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await selectedFile.OpenReadStream().CopyToAsync(stream);
+            }
+
+            invoicePathUrl = $"/Images/Receipts/{uniqueFileName}";
+            returnModel.InvoicePathUrl = invoicePathUrl;
+        }
+
+        // TODO: Save the returnModel to your database or processing system here
+        // Example:
+        // await returnService.SaveReturnAsync(returnModel);
+
+        // Display a success message (optional)
+        // You can use a toast notification or any other method
+
+        // Navigate to Confirmation page
+        NavigationManager.NavigateTo("/confirmation");
+    }
+
+    private void HandleFileSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+    }
+}

@@ -1,0 +1,74 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/products"
+@inject ProductService ProductService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    All Products
+</h1>
+
+@if (Products == null || !Products.Any())
+{
+    <div class="alert alert-warning mt-4">
+        No products found.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-hover mt-4">
+        <thead class="thead-dark text-uppercase text-center" style="background-color: gainsboro">
+            <tr>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Weight</th>
+                <th>Color</th>
+                <th>Manufacturer</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Quantity</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in Products)
+            {
+                <tr>
+                    <td>@product.Id</td>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@product.Weight</td>
+                    <td>@product.Color</td>
+                    <td>@product.Manufacturer</td>
+                    <td>@product.Category</td>
+                    <td>@product.Price</td>
+                    <td>@product.Quantity</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <button class="btn btn-link text-dark" @onclick="NavigateToAdminPanel">
+            Return to Admin Panel
+        </button>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<Product> Products = Enumerable.Empty<Product>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load all products from the service
+        Products = await ProductService.GetAll();
+    }
+
+    private void NavigateToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}

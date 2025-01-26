@@ -1,0 +1,171 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/user/add/{Id:int?}"
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Add User
+</h1>
+
+<EditForm Model="User" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <!-- Full Name -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="Name" class="form-label">Full Name</label>
+                <InputText id="Name" class="form-control" @bind-Value="User.Name" />
+                <ValidationMessage For="@(() => User.Name)" class="text-danger" />
+            </div>
+        </div>
+    </div>
+
+    <!-- UserName -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="UserName" class="form-label">UserName</label>
+                <InputText id="UserName" class="form-control" @bind-Value="User.UserName" />
+                <ValidationMessage For="@(() => User.UserName)" class="text-danger" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Email -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="Email" class="form-label">Email</label>
+                <InputText id="Email" type="email" class="form-control" @bind-Value="User.Email" />
+                <ValidationMessage For="@(() => User.Email)" class="text-danger" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Password -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="Password" class="form-label">Password</label>
+                <div class="input-group">
+                    <input type="@PasswordFieldType" class="form-control" id="Password" @bind="User.Password" />
+                    <button type="button" class="btn btn-outline-secondary" @onclick="TogglePasswordVisibility">
+                        <i class="fa" aria-hidden="true" style="cursor: pointer;">
+                            @PasswordToggleText
+                        </i>
+                    </button>
+                </div>
+                <ValidationMessage For="@(() => User.Password)" class="text-danger" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Address -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="Address" class="form-label">Address</label>
+                <InputTextArea class="form-control" @bind-Value="User.Address" />
+                <ValidationMessage For="@(() => User.Address)" class="text-danger" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Phone -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="Phone" class="form-label">Phone#</label>
+                <InputText id="Phone" type="tel" class="form-control" @bind-Value="User.Phone" />
+                <ValidationMessage For="@(() => User.Phone)" class="text-danger" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Gender -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="Gender" class="form-label">Gender</label>
+                <InputSelect id="Gender" class="form-control" @bind-Value="User.Gender">
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Prefer not to specify">Prefer not to specify</option>
+                </InputSelect>
+                <ValidationMessage For="@(() => User.Gender)" class="text-danger" />
+            </div>
+        </div>
+    </div>
+
+    <!-- Date of Birth -->
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="DateOfBirth" class="form-label">Date Of Birth</label>
+                <InputDate id="DateOfBirth" class="form-control" @bind-Value="User.DateOfBirth" />
+                <ValidationMessage For="@(() => User.DateOfBirth)" class="text-danger" />
+            </div>
+        </div>
+    </div>
+
+    <button type="submit" class="custom-button text-center">Submit</button>
+</EditForm>
+
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <a class="nav-link text-dark" @onclick="ReturnToAdminPanel">Return to Admin Panel</a>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    private User User = new User();
+
+    private string PasswordFieldType = "password";
+    private string PasswordToggleText = "Show Password";
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (Id.HasValue && Id.Value > 0)
+        {
+            User = await UserService.GetById(Id.Value) ?? new User();
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (User.Id == 0)
+        {
+            await UserService.Insert(User);
+        }
+        else
+        {
+            await UserService.Update(User);
+        }
+
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    private void ReturnToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+
+    private void TogglePasswordVisibility()
+    {
+        if (PasswordFieldType == "password")
+        {
+            PasswordFieldType = "text";
+            PasswordToggleText = "Hide Password";
+        }
+        else
+        {
+            PasswordFieldType = "password";
+            PasswordToggleText = "Show Password";
+        }
+    }
+}

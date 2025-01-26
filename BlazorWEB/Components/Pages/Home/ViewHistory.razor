@@ -1,0 +1,99 @@
+﻿@page "/history"
+@using Newtonsoft.Json
+@using Core.Entities
+@using Microsoft.AspNetCore.Components.Authorization
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@inject NavigationManager NavigationManager
+
+<h2>Page Visit History</h2>
+
+@if (isAuthenticated)
+{
+    if (errorMessage != null)
+    {
+        <div class="alert alert-danger">@errorMessage</div>
+    }
+    else if (historyList != null && historyList.Count > 0)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Page</th>
+                    <th>Date and Time of Visit</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (Core.Entities.History history in historyList)
+                {
+                    <tr>
+                        <td>
+                            <a href="@history.PageUrl">@history.PageName</a>
+                        </td>
+                        <td>@history.PageTime.ToString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+    else
+    {
+        <p>No pages visited yet.</p>
+    }
+}
+else
+{
+    <p>Please log in to see your page visit history.</p>
+}
+
+@code {
+    // List to hold history data
+    private List<History> historyList = new List<History>();
+    private bool isAuthenticated = false;
+    private string errorMessage = null;
+
+    // Cascading parameter to access authentication state
+    [CascadingParameter]
+    private Task<AuthenticationState> authenticationStateTask { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Get the current authentication state
+        var authState = await authenticationStateTask;
+        var user = authState.User;
+
+        if (user.Identity.IsAuthenticated)
+        {
+            isAuthenticated = true;
+
+            // Retrieve the user ID. Adjust the claim type if necessary.
+            var userId = user.Identity.Name;
+
+            if (!string.IsNullOrEmpty(userId))
+            {
+                var sessionKey = $"PagesVisited_{userId}";
+                var pagesVisitedJson = HttpContextAccessor.HttpContext.Session.GetString(sessionKey);
+
+                if (!string.IsNullOrEmpty(pagesVisitedJson))
+                {
+                    try
+                    {
+                        historyList = JsonConvert.DeserializeObject<List<History>>(pagesVisitedJson) ?? new List<History>();
+                        // Reverse the list to show the latest visits first
+                        historyList = historyList.AsEnumerable().Reverse().ToList();
+                    }
+                    catch (JsonException)
+                    {
+                        // Handle JSON deserialization errors
+                        errorMessage = "Failed to load page visit history. Please try again later.";
+                        historyList = new List<History>();
+                    }
+                }
+            }
+            else
+            {
+                errorMessage = "User ID not found.";
+            }
+        }
+    }
+}

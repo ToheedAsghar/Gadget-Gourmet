@@ -1,0 +1,72 @@
+﻿@page "/store"
+
+@using Core.Entities
+@inject NavigationManager NavigationManager
+@using BlazorWEB.Components.Controls
+@rendermode InteractiveServer
+
+<PageTitle>Our Product Catalog</PageTitle>
+
+<div class="container mt-4">
+    <!-- Search Bar -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <input type="text"
+                   @bind="searchTerm"
+                   @bind:event="oninput"
+                   class="form-control"
+                   placeholder="Search for products..." />
+        </div>
+    </div>
+
+    <!-- Product Cards -->
+    <div class="row">
+        @foreach (var product in FilteredProducts)
+        {
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        @product.Name
+                    </div>
+                    <div class="card-body">
+                        <p>@product.Description</p>
+                    </div>
+                    <div class="card-footer text-end">
+                        <button class="btn btn-primary" @onclick="() => ViewDetails(product)">
+                            View Details
+                        </button>
+                        <button class="btn btn-success ms-2" @onclick="() => AddToCart(product)">
+                            Add to Cart
+                        </button>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Inject] private Application.ProductService ProductService { get; set; }
+
+    private List<Product> products = new();
+    private string searchTerm = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = (await ProductService.GetAll()).ToList();
+    }
+
+    private IEnumerable<Product> FilteredProducts =>
+        products.Where(p => p.Name.Contains(searchTerm, StringComparison.OrdinalIgnoreCase));
+
+    private void ViewDetails(Product product)
+    {
+        // Implement logic to view details
+    }
+
+    private void AddToCart(Product product)
+    {
+        // Implement logic to add to cart
+    }
+}
+
