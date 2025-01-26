@@ -15,7 +15,6 @@ public class UserService
 
     #region USER_CRUD_OPERATIONS
 
-
     public async Task<IEnumerable<User>> GetAll()
     {
         return await _userGenericRepository.GetAll() ;

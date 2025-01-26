@@ -1,0 +1,79 @@
+﻿@page "/contactus"
+@using Application;
+@inject HistoryService _historyService
+@inject NavigationManager Navigation
+
+<div class="container my-5 py-5" style="font-family: Noah;">
+    <div class="row text-center">
+        <h2 class="fw-bold mb-4">Get In Touch With Us</h2>
+        <p class="fs-6 text-muted">
+            We’d love to hear from you! Whether you have a question about products, pricing, need a demo, or anything else,
+            our team is ready to answer all your questions.
+        </p>
+    </div>
+
+    <div class="row mt-5">
+        <!-- Contact Form -->
+        <div class="col-md-6">
+            <EditForm Model="@contactModel" OnValidSubmit="HandleSubmit" FormName="ContactUsForm">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <label for="email" class="form-label fw-bold">Your Email</label>
+                    <InputText id="email" class="form-control" @bind-Value="contactModel.Email" placeholder="Enter your email" />
+                </div>
+
+                <div class="mb-3">
+                    <label for="message" class="form-label fw-bold">Your Message</label>
+                    <InputTextArea id="message" class="form-control" @bind-Value="contactModel.Message" rows="5" placeholder="Write your message here..." />
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 py-2 mt-3" style="border-radius: 25px; font-weight: bold;">Send Message</button>
+            </EditForm>
+        </div>
+
+        <!-- Contact Information -->
+        <div class="col-md-6 d-flex flex-column align-items-center justify-content-center">
+            <div class="contact-info mb-4 text-center">
+                <h5 class="fw-bold">Contact Information</h5>
+                <p class="text-muted">Feel free to reach out to us via phone, email, or stop by our office during business hours.</p>
+            </div>
+            <div class="contact-details">
+                <p><strong>Phone:</strong> +92-321-7880049</p>
+                <p><strong>Email:</strong> info@gadgetgourmet.com</p>
+                <p><strong>Address:</strong> DHA Sector XX, Lahore</p>
+            </div>
+            <div class="social-icons mt-4">
+                <a href="https://www.facebook.com" class="me-3" target="_blank"><i class="fab fa-facebook-f fa-2x"></i></a>
+                <a href="https://www.tiktok.com" class="me-3" target="_blank"><i class="fab fa-tiktok fa-2x"></i></a>
+                <a href="https://www.instagram.com" class="me-3" target="_blank"><i class="fab fa-instagram fa-2x"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha384-k6RqeWeci5ZR/Lv4MR0sA0FfDOM3i9B2l4HxDO3THVuKc9J69jSF1auxAB1qsh8Q" crossorigin="anonymous">
+
+@code {
+    private ContactModel contactModel = new ContactModel();
+
+    protected override void OnInitialized()
+    {
+        // Track page visit
+        _historyService.TrackPageVisit("Contact Us", Navigation.Uri, DateTime.Now.ToString("f"));
+    }
+
+    private void HandleSubmit()
+    {
+        // Handle the form submission logic here (e.g., saving the data or sending an email).
+        // After submission, navigate to the homepage or show a success message
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+
+    public class ContactModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+    }
+}

@@ -1,0 +1,72 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/product/update"
+@inject NavigationManager NavigationManager
+@inject ProductService ProductService
+
+@rendermode InteractiveServer
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Update Product
+</h1>
+
+<EditForm Model="ProductId" OnValidSubmit="HandleUpdate">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="Id" class="form-label">Product Id</label>
+                <InputNumber id="Id" class="form-control" @bind-Value="ProductId" required />
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+
+    <button type="submit" class="custom-button text-center">Edit</button>
+</EditForm>
+
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <button class="btn btn-link text-dark" @onclick="NavigateToAdminPanel">
+            Return to Admin Panel
+        </button>
+    </div>
+</div>
+
+@code {
+    private int ProductId { get; set; }
+    private string ErrorMessage { get; set; }
+
+    private async Task HandleUpdate()
+    {
+        try
+        {
+            // Check if the product exists
+            var product = await ProductService.GetById(ProductId);
+
+            // Navigate to the product details update page if found
+            if (product != null)
+            {
+                NavigationManager.NavigateTo($"/admin/product/update/details/{ProductId}");
+            }
+            else
+            {
+                ErrorMessage = "Product not found. Please enter a valid Product ID.";
+            }
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "An error occurred while checking the product. Please try again.";
+        }
+    }
+
+    private void NavigateToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}

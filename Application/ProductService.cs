@@ -50,4 +50,33 @@ public class ProductService
         }
         return products;
     }
+
+    public async Task<List<Product>> SearchProductsAsync(string searchTerm, string selectedCategory)
+    {
+        using (var connection = new SqlConnection(connectionString))
+        {
+            // Base SQL query
+            var sql = @"SELECT * FROM Products WHERE 1=1";
+
+            // Dynamic parameters
+            var parameters = new DynamicParameters();
+
+            // Append search conditions if applicable
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                sql += " AND (Name LIKE @SearchTerm OR Manufacturer LIKE @SearchTerm)";
+                parameters.Add("SearchTerm", $"%{searchTerm}%");
+            }
+
+            if (!string.IsNullOrWhiteSpace(selectedCategory))
+            {
+                sql += " AND Category = @SelectedCategory";
+                parameters.Add("SelectedCategory", selectedCategory);
+            }
+
+            var products = await connection.QueryAsync<Product>(sql, parameters);
+            return products.ToList();
+        }
+    }
+
 }

@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Insfrastructure", "Insfrastructure\Insfrastructure.csproj", "{4AEEEA9A-80DC-45C3-A1ED-AC001293FB34}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Web", "Web\Web.csproj", "{27FBAF37-9439-4541-AA68-C180F7644F85}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorWEB", "BlazorWEB\BlazorWEB.csproj", "{7CA497F8-EF4F-46BF-8431-27CD7500D586}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{4AEEEA9A-80DC-45C3-A1ED-AC001293FB34}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AEEEA9A-80DC-45C3-A1ED-AC001293FB34}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AEEEA9A-80DC-45C3-A1ED-AC001293FB34}.Release|Any CPU.Build.0 = Release|Any CPU
-		{27FBAF37-9439-4541-AA68-C180F7644F85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{27FBAF37-9439-4541-AA68-C180F7644F85}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{27FBAF37-9439-4541-AA68-C180F7644F85}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{27FBAF37-9439-4541-AA68-C180F7644F85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7CA497F8-EF4F-46BF-8431-27CD7500D586}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7CA497F8-EF4F-46BF-8431-27CD7500D586}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7CA497F8-EF4F-46BF-8431-27CD7500D586}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7CA497F8-EF4F-46BF-8431-27CD7500D586}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

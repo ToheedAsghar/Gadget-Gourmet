@@ -1,0 +1,31 @@
+﻿.product-image {
+    transition: transform 0.3s ease;
+}
+
+.card:hover .product-image {
+    transform: scale(1.05);
+}
+
+.card:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    transform: translateY(-5px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Ensure badges are properly styled and visible */
+.badge {
+    font-size: 0.8rem;
+}
+
+/* Truncate long text in card titles */
+.card-title {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Adjust spinner alignment */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}

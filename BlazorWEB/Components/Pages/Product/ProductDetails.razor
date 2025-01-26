@@ -1,0 +1,107 @@
+﻿<!-- Pages/ProductDetails.razor -->
+@page "/product/{ProductId:int}"
+@using Core.Entities
+@using BlazorWEB.Components.Controls
+@inject Application.ProductService ProductService
+@inject NavigationManager NavigationManager
+
+@if (isLoading)
+{
+    <div class="container py-5">
+        <div class="text-center">
+            <div class="spinner-border text-primary" role="status" style="width: 5rem; height: 5rem;">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+}
+else if (product == null)
+{
+    <div class="container py-5">
+        <div class="text-center">
+            <h2 class="display-4 text-danger">Product Not Found</h2>
+            <p class="lead">The product you're looking for does not exist.</p>
+            <button class="btn btn-primary" @onclick="NavigateBack">Go Back to Store</button>
+        </div>
+    </div>
+}
+else
+{
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-md-6">
+                <img src="@product.ImageUrl" alt="@product.Name" class="img-fluid rounded shadow">
+            </div>
+            <div class="col-md-6">
+                <h2 class="mb-3">@product.Name</h2>
+                <h4 class="text-primary mb-4">${@product.Price:F2}</h4>
+                <p>@product.Description</p>
+                <ul class="list-unstyled mb-4">
+                    <li><strong>Manufacturer:</strong> @product.Manufacturer</li>
+                    <li><strong>Category:</strong> @product.Category</li>
+                    <li><strong>Color:</strong> @product.Color</li>
+                    <li><strong>Weight:</strong> @product.Weight kg</li>
+                    <li><strong>In Stock:</strong> @product.Quantity</li>
+                </ul>
+                <button class="btn btn-success btn-lg mr-3" @onclick="AddToCart" disabled="@(product.Quantity <= 0)">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M0 1.5A.5.5 0 01.5 1h1a.5.5 0 01.485.379L2.89 5H14.5a.5.5 0 01.49.598l-1.5 6A.5.5 0 0113 12H4a.5.5 0 01-.491-.408L1.01 2H.5a.5.5 0 01-.5-.5zM3.102 5l1.313 5h8.17l1.313-5H3.102zM5 13a1 1 0 100 2 1 1 0 000-2zm6 1a1 1 0 11-2 0 1 1 0 012 0z" />
+                    </svg>
+                    @(product.Quantity > 0 ? "Add to Cart" : "Out of Stock")
+                </button>
+                <button class="btn btn-outline-secondary btn-lg" @onclick="NavigateBack">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="mr-2" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M5.854 4.646a.5.5 0 010 .708L3.707 7.5H14.5a.5.5 0 010 1H3.707l2.147 2.146a.5.5 0 11-.708.708l-3-3a.5.5 0 010-.708l3-3a.5.5 0 01.708 0z" clip-rule="evenodd" />
+                    </svg>
+                    Back to Store
+                </button>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int ProductId { get; set; }
+
+    private Product? product;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProductDetails();
+    }
+
+    private async Task LoadProductDetails()
+    {
+        try
+        {
+            isLoading = true;
+            product = await ProductService.GetById(ProductId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading product details: {ex.Message}");
+            product = null;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void AddToCart()
+    {
+        if (product != null && product.Quantity > 0)
+        {
+            // Implement your AddToCart logic here, e.g., call a service or update the cart state
+            // For demonstration, we'll navigate to a cart add URL
+            NavigationManager.NavigateTo($"/cart/add/{product.Id}");
+        }
+    }
+
+    private void NavigateBack()
+    {
+        NavigationManager.NavigateTo("/store");
+    }
+}

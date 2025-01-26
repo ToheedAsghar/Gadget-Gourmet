@@ -1,0 +1,82 @@
+﻿@using Application
+@using Core.Entities
+@page "/admin/category/update/details/{CategoryId:int}"
+@inject CategoryService CategoryService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<h1 class="display-1 mt-2 ps-md-2 fw-bold text-uppercase" style="font-family: Noah; font-size:170%;">
+    Enter Your Favourite Name
+</h1>
+
+<EditForm Model="Category" OnValidSubmit="HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <InputHidden @bind="Category.Id" />
+
+    <div class="container mb-3">
+        <div class="row">
+            <div class="col-md-5 col-12">
+                <label for="Name" class="form-label">Category Name</label>
+                <InputText id="Name" class="form-control" @bind-Value="Category.Name" required />
+                <span class="text-danger">@ErrorMessage</span>
+            </div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <div class="alert alert-danger">@ErrorMessage</div>
+    }
+
+    <button type="submit" class="custom-button text-center">Update</button>
+</EditForm>
+
+<div class="container-fluid mt-5" style="font-family: Noah">
+    <div class="row">
+        <button class="btn btn-link text-dark" @onclick="NavigateToAdminPanel">
+            Return to Admin Panel
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter] public int CategoryId { get; set; }
+    private Category Category { get; set; } = new Category();
+    private string ErrorMessage { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Fetch category details using the CategoryId
+            Category = await CategoryService.GetById(CategoryId);
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "Unable to load category details. Please ensure the category exists.";
+        }
+    }
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            // Update the category details
+            await CategoryService.Update(Category);
+
+            // Navigate to the admin panel after successful update
+            NavigationManager.NavigateTo("/admin");
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "An error occurred while updating the category. Please try again.";
+        }
+    }
+
+    private void NavigateToAdminPanel()
+    {
+        NavigationManager.NavigateTo("/admin");
+    }
+}
